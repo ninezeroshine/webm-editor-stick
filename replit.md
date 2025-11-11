@@ -11,6 +11,8 @@ This application allows users to upload WebM video files and modify the duration
   - Created Flask backend with binary EBML processing
   - Implemented frontend with drag-and-drop interface
   - Dark-themed UI with centered 600px layout
+  - Fixed unit conversion: milliseconds input converted to seconds for EBML spec
+  - Added EBML size byte (0x88) validation for robust error handling
 
 ## Project Architecture
 
@@ -19,7 +21,9 @@ This application allows users to upload WebM video files and modify the duration
   - `/` - Serves the frontend HTML page
   - `/upload` - POST endpoint for file processing
   - Binary EBML parser that searches for Duration tag (0x4489)
-  - Modifies 8-byte IEEE 754 float64 value
+  - Validates EBML size byte (0x88) before modification
+  - Converts milliseconds to seconds (EBML Duration spec requirement)
+  - Modifies 8-byte IEEE 754 float64 value with proper unit conversion
   - Returns modified file for download
 
 ### Frontend
@@ -30,9 +34,11 @@ This application allows users to upload WebM video files and modify the duration
 ## Technical Details
 - File size limit: 10MB
 - Supported format: .webm only
-- Duration stored as IEEE 754 double-precision float (8 bytes)
+- Duration input: milliseconds (converted to seconds for EBML spec compliance)
+- Duration stored as IEEE 754 double-precision float (8 bytes) in EBML format
 - Direct binary search without external EBML libraries
-- Uses struct module for float64 packing
+- Uses struct module for float64 packing (big-endian)
+- EBML size byte validation (0x88) prevents corruption of malformed files
 
 ## Dependencies
 - Python 3.11
