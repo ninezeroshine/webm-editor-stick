@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebM Metadata Editor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>WebM Metadata Editor</h1>
+        <p class="subtitle">Modify EBML Duration metadata in your WebM files</p>
+        
+        <div id="dropZone" class="drop-zone">
+            <svg class="upload-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p class="drop-text">Drag & drop your .webm file here</p>
+            <p class="drop-subtext">or click to browse</p>
+            <input type="file" id="fileInput" accept=".webm" hidden>
+        </div>
+        
+        <div id="fileInfo" class="file-info hidden">
+            <p><strong>Selected file:</strong> <span id="fileName"></span></p>
+            <p><strong>Size:</strong> <span id="fileSize"></span></p>
+        </div>
+        
+        <div class="input-group">
+            <label for="durationInput">Duration (milliseconds)</label>
+            <input type="number" id="durationInput" value="3000" min="0" step="1">
+        </div>
+        
+        <button id="processBtn" class="btn btn-primary" disabled>Process File</button>
+        
+        <div id="statusMessage" class="status-message hidden"></div>
+        
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Processing your file...</p>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
