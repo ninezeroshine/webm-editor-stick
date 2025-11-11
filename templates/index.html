@@ -32,6 +32,35 @@
             <input type="number" id="durationInput" value="3000" min="0" step="1">
         </div>
         
+        <div class="input-group">
+            <label>
+                <input type="checkbox" id="compressCheckbox">
+                Compress video with FFmpeg
+            </label>
+        </div>
+        
+        <div id="compressionOptions" class="compression-options hidden">
+            <div class="input-group">
+                <label for="crfInput">Quality (CRF: 15-35, lower = better)</label>
+                <input type="number" id="crfInput" value="30" min="15" max="35" step="1">
+            </div>
+            <div class="input-group">
+                <label for="bitrateInput">Target Bitrate</label>
+                <select id="bitrateInput">
+                    <option value="200k">200k (very low)</option>
+                    <option value="300k">300k (low)</option>
+                    <option value="400k">400k (low-medium)</option>
+                    <option value="500k" selected>500k (medium)</option>
+                    <option value="600k">600k (medium-high)</option>
+                    <option value="700k">700k (high)</option>
+                    <option value="800k">800k (high)</option>
+                    <option value="1M">1M (very high)</option>
+                    <option value="1.2M">1.2M (ultra)</option>
+                    <option value="1.5M">1.5M (ultra+)</option>
+                </select>
+            </div>
+        </div>
+        
         <button id="processBtn" class="btn btn-primary" disabled>Process File</button>
         
         <div id="statusMessage" class="status-message hidden"></div>

@@ -1,5 +1,9 @@
+# Git
+.git
+.gitignore
+
 # Python
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 *.so
@@ -23,14 +27,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Flask
-instance/
-.webassets-cache
-
-# Environment
-.env
-.venv
-
 # IDE
 .vscode/
 .idea/
@@ -46,5 +42,9 @@ Thumbs.db
 .local/
 *.webm
 
-# Replit
-.replit
+# Documentation
+README.md
+replit.md
+
+# Fly.io
+fly.toml

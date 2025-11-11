@@ -4,11 +4,23 @@ const fileInfo = document.getElementById('fileInfo');
 const fileName = document.getElementById('fileName');
 const fileSize = document.getElementById('fileSize');
 const durationInput = document.getElementById('durationInput');
+const compressCheckbox = document.getElementById('compressCheckbox');
+const compressionOptions = document.getElementById('compressionOptions');
+const crfInput = document.getElementById('crfInput');
+const bitrateInput = document.getElementById('bitrateInput');
 const processBtn = document.getElementById('processBtn');
 const statusMessage = document.getElementById('statusMessage');
 const loadingIndicator = document.getElementById('loadingIndicator');
 
 let selectedFile = null;
+
+compressCheckbox.addEventListener('change', () => {
+    if (compressCheckbox.checked) {
+        compressionOptions.classList.remove('hidden');
+    } else {
+        compressionOptions.classList.add('hidden');
+    }
+});
 
 dropZone.addEventListener('click', () => {
     fileInput.click();
@@ -85,8 +97,22 @@ processBtn.addEventListener('click', async () => {
     formData.append('file', selectedFile);
     formData.append('duration', duration.toString());
     
+    const useCompression = compressCheckbox.checked;
+    let endpoint = '/upload';
+    let downloadSuffix = '_fixed';
+    
+    if (useCompression) {
+        endpoint = '/compress';
+        downloadSuffix = '_compressed';
+        formData.append('crf', crfInput.value);
+        formData.append('bitrate', bitrateInput.value);
+        loadingIndicator.querySelector('p').textContent = 'Compressing video (this may take a few minutes)...';
+    } else {
+        loadingIndicator.querySelector('p').textContent = 'Processing your file...';
+    }
+    
     try {
-        const response = await fetch('/upload', {
+        const response = await fetch(endpoint, {
             method: 'POST',
             body: formData
         });
@@ -102,7 +128,7 @@ processBtn.addEventListener('click', async () => {
         a.href = url;
         
         const originalName = selectedFile.name.replace('.webm', '');
-        a.download = `${originalName}_fixed.webm`;
+        a.download = `${originalName}${downloadSuffix}.webm`;
         
         document.body.appendChild(a);
         a.click();
