@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: webm-metadata-editor
+    env: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 8080
