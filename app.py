@@ -135,17 +135,24 @@ def compress_file():
         output_path = tempfile.mktemp(suffix='_compressed.webm')
         
         try:
-            # FFmpeg command for WebM with VP9 + alpha channel preservation
-            # Minimal parameters to ensure transparency works correctly
+            # FFmpeg command for WebM compression with alpha preservation
             ffmpeg_cmd = [
                 'ffmpeg',
-                '-i', input_path,
                 '-c:v', 'libvpx-vp9',
-                '-pix_fmt', 'yuva420p',  # Force alpha channel pixel format
-                '-auto-alt-ref', '0',  # CRITICAL: Must be 0 for alpha to work
+                '-i', input_path,
+                '-vf', 'format=yuva420p',
+                '-c:v', 'libvpx-vp9',
+                '-pix_fmt', 'yuva420p',
+                '-auto-alt-ref', '0',
+                '-lag-in-frames', '0',
+                '-row-mt', '1',
+                '-cpu-used', '4',
+                '-deadline', 'good',
                 '-crf', str(crf_value),
                 '-b:v', bitrate,
-                '-c:a', 'copy',  # Copy audio without re-encoding to preserve quality
+                '-c:a', 'libopus',
+                '-b:a', '96k',
+                '-metadata:s:v:0', 'alpha_mode=1',
                 '-y',
                 output_path
             ]
