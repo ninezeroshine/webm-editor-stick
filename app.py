@@ -140,6 +140,7 @@ def compress_file():
                 'ffmpeg',
                 '-i', input_path,
                 '-c:v', 'libvpx-vp9',  # VP9 video codec
+                '-pix_fmt', 'yuva420p',  # Pixel format with alpha channel support
                 '-crf', str(crf_value),  # Quality setting
                 '-b:v', bitrate,  # Target bitrate
                 '-c:a', 'libopus',  # Opus audio codec
@@ -147,6 +148,7 @@ def compress_file():
                 '-cpu-used', '4',  # Speed vs quality (0-5, higher = faster)
                 '-row-mt', '1',  # Multi-threading
                 '-deadline', 'good',  # Encoding quality mode
+                '-auto-alt-ref', '0',  # Disable alt-ref frames for transparency
                 '-y',  # Overwrite output
                 output_path
             ]
