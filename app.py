@@ -117,7 +117,10 @@ def compress_file():
         
         # Get compression parameters
         crf = request.form.get('crf', '30')  # Quality (15-35, lower = better quality)
-        bitrate = request.form.get('bitrate', '500k')  # Target bitrate
+        auto_optimize = request.form.get('auto_optimize', 'false').lower() == 'true'
+        target_size_kb = request.form.get('target_size_kb', '256')  # Desired max size in KB
+        real_duration = request.form.get('real_duration')  # Real video duration for bitrate calculation
+        bitrate = request.form.get('bitrate', '500k')  # Manual bitrate selection
         duration_ms = request.form.get('duration')  # Optional duration to set
         
         try:
@@ -135,7 +138,7 @@ def compress_file():
         output_path = tempfile.mktemp(suffix='_compressed.webm')
         
         try:
-            # FFmpeg command for WebM compression with alpha preservation
+            # Build FFmpeg command for WebM compression with alpha preservation
             ffmpeg_cmd = [
                 'ffmpeg',
                 '-c:v', 'libvpx-vp9',
@@ -147,15 +150,51 @@ def compress_file():
                 '-lag-in-frames', '0',
                 '-row-mt', '1',
                 '-cpu-used', '4',
-                '-deadline', 'good',
-                '-crf', str(crf_value),
-                '-b:v', bitrate,
-                '-c:a', 'libopus',
-                '-b:a', '96k',
+                '-deadline', 'good'
+            ]
+            
+            if auto_optimize:
+                # Automatic bitrate calculation to hit target file size
+                # Use user-provided real duration instead of ffprobe (since metadata duration may differ)
+                duration_seconds = 3.0  # default fallback
+                
+                if real_duration:
+                    try:
+                        duration_seconds = float(real_duration)
+                        if duration_seconds <= 0:
+                            return jsonify({'error': 'Real duration must be positive'}), 400
+                    except ValueError:
+                        return jsonify({'error': 'Invalid real duration value'}), 400
+                
+                try:
+                    target_size_bytes = max(1, int(float(target_size_kb) * 1024))
+                except ValueError:
+                    return jsonify({'error': 'Invalid target size value'}), 400
+                
+                # Reserve margin for container overhead and encoder variance (~42%)
+                # VP9 with alpha and WebM container adds overhead
+                target_video_bits = max(int(target_size_bytes * 8 * 0.58), 8000)
+                video_bitrate = max(int(target_video_bits / duration_seconds), 20000)  # bits per second
+                
+                ffmpeg_cmd.extend([
+                    '-b:v', str(video_bitrate),
+                    '-maxrate', str(video_bitrate),
+                    '-bufsize', str(int(video_bitrate * 1.5))
+                ])
+            else:
+                # Manual bitrate selection with CRF for quality control
+                ffmpeg_cmd.extend([
+                    '-crf', str(crf_value),
+                    '-b:v', bitrate
+                ])
+            
+            # Common parameters
+            ffmpeg_cmd.extend([
+                '-an',
                 '-metadata:s:v:0', 'alpha_mode=1',
                 '-y',
                 output_path
-            ]
+            ])
             
             # Run FFmpeg
             result = subprocess.run(

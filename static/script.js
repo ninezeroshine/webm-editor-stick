@@ -6,8 +6,14 @@ const fileSize = document.getElementById('fileSize');
 const durationInput = document.getElementById('durationInput');
 const compressCheckbox = document.getElementById('compressCheckbox');
 const compressionOptions = document.getElementById('compressionOptions');
+const autoOptimizeCheckbox = document.getElementById('autoOptimizeCheckbox');
+const crfGroup = document.getElementById('crfGroup');
+const manualBitrateGroup = document.getElementById('manualBitrateGroup');
+const targetSizeGroup = document.getElementById('targetSizeGroup');
 const crfInput = document.getElementById('crfInput');
 const bitrateInput = document.getElementById('bitrateInput');
+const targetSizeInput = document.getElementById('targetSizeInput');
+const realDurationInput = document.getElementById('realDurationInput');
 const processBtn = document.getElementById('processBtn');
 const statusMessage = document.getElementById('statusMessage');
 const loadingIndicator = document.getElementById('loadingIndicator');
@@ -19,6 +25,18 @@ compressCheckbox.addEventListener('change', () => {
         compressionOptions.classList.remove('hidden');
     } else {
         compressionOptions.classList.add('hidden');
+    }
+});
+
+autoOptimizeCheckbox.addEventListener('change', () => {
+    if (autoOptimizeCheckbox.checked) {
+        crfGroup.classList.add('hidden');
+        manualBitrateGroup.classList.add('hidden');
+        targetSizeGroup.classList.remove('hidden');
+    } else {
+        crfGroup.classList.remove('hidden');
+        manualBitrateGroup.classList.remove('hidden');
+        targetSizeGroup.classList.add('hidden');
     }
 });
 
@@ -105,7 +123,15 @@ processBtn.addEventListener('click', async () => {
         endpoint = '/compress';
         downloadSuffix = '_compressed';
         formData.append('crf', crfInput.value);
-        formData.append('bitrate', bitrateInput.value);
+        
+        if (autoOptimizeCheckbox.checked) {
+            formData.append('auto_optimize', 'true');
+            formData.append('target_size_kb', targetSizeInput.value);
+            formData.append('real_duration', realDurationInput.value);
+        } else {
+            formData.append('bitrate', bitrateInput.value);
+        }
+        
         loadingIndicator.querySelector('p').textContent = 'Compressing video (this may take a few minutes)...';
     } else {
         loadingIndicator.querySelector('p').textContent = 'Processing your file...';
