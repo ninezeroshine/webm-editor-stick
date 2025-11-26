@@ -120,7 +120,7 @@ echo Checking dependencies...
 "%PYTHON_EXE%" -m pip install Flask Werkzeug -q 2>nul
 echo [OK] Dependencies ready.
 
-start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && echo Current folder: %SCRIPT_DIR% && echo. && dir app.py 2>nul || echo [ERROR] app.py NOT FOUND in this folder! && echo. && "%PYTHON_EXE%" app.py & echo. & echo ======================================== & echo Server stopped or failed. See error above. & echo ======================================== & pause"
+start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && echo Current folder: %SCRIPT_DIR% && echo. && echo Testing Python... && "%PYTHON_EXE%" -c "print('Python OK'); import flask; print('Flask OK')" && echo. && echo Starting app.py... && "%PYTHON_EXE%" app.py & echo. & echo ======================================== & echo Server stopped. See error above if any. & echo ======================================== & pause"
 
 echo Waiting for server...
 timeout /t 2 >nul
