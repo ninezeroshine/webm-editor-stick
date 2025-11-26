@@ -21,19 +21,8 @@ if exist "%PYTHON_EXE%" (
     goto :check_deps
 )
 
-:: Check if system Python exists and actually works
-where python >nul 2>&1
-if %errorlevel%==0 (
-    python --version >nul 2>&1
-    if %errorlevel%==0 (
-        echo [OK] System Python found.
-        set PYTHON_EXE=python
-        goto :run_server
-    )
-)
-
-:: No Python found - download portable version
-echo [!] Python not found. Downloading portable Python...
+:: No portable Python found - download it
+echo [!] Portable Python not found. Downloading...
 echo.
 
 :: Download Python embeddable package
