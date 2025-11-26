@@ -7,6 +7,16 @@ from werkzeug.utils import secure_filename
 import io
 
 app = Flask(__name__)
+
+# Determine FFmpeg path - use local ffmpeg folder if exists, otherwise system ffmpeg
+def get_ffmpeg_path():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    local_ffmpeg = os.path.join(script_dir, 'ffmpeg', 'ffmpeg.exe')
+    if os.path.exists(local_ffmpeg):
+        return local_ffmpeg
+    return 'ffmpeg'  # Fall back to system ffmpeg
+
+FFMPEG_PATH = get_ffmpeg_path()
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB limit
 
 @app.route('/')
@@ -140,7 +150,7 @@ def compress_file():
         try:
             # Build FFmpeg command for WebM compression with alpha preservation
             ffmpeg_cmd = [
-                'ffmpeg',
+                FFMPEG_PATH,
                 '-c:v', 'libvpx-vp9',
                 '-i', input_path,
                 '-vf', 'format=yuva420p',

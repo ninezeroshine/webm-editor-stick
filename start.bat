@@ -9,6 +9,10 @@ set PYTHON_EXE=%PYTHON_DIR%\python.exe
 set PYTHON_ZIP=%SCRIPT_DIR%python.zip
 set PYTHON_URL=https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip
 set GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py
+set FFMPEG_DIR=%SCRIPT_DIR%ffmpeg
+set FFMPEG_EXE=%FFMPEG_DIR%\ffmpeg.exe
+set FFMPEG_ZIP=%SCRIPT_DIR%ffmpeg.zip
+set FFMPEG_URL=https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
 
 echo ========================================
 echo   WebM Metadata Editor - Launcher
@@ -18,7 +22,7 @@ echo.
 :: Check if portable Python exists
 if exist "%PYTHON_EXE%" (
     echo [OK] Portable Python found.
-    goto :check_deps
+    goto :check_ffmpeg
 )
 
 :: No portable Python found - download it
@@ -76,6 +80,54 @@ if %errorlevel% neq 0 (
 del "%PYTHON_DIR%\get-pip.py" 2>nul
 
 echo [OK] Portable Python installed successfully!
+echo.
+
+:check_ffmpeg
+:: Check if FFmpeg exists
+if exist "%FFMPEG_EXE%" (
+    echo [OK] FFmpeg found.
+    goto :check_deps
+)
+
+:: Check if system FFmpeg exists
+where ffmpeg >nul 2>&1
+if %errorlevel%==0 (
+    echo [OK] System FFmpeg found.
+    goto :check_deps
+)
+
+:: Download FFmpeg
+echo [!] FFmpeg not found. Downloading...
+echo.
+
+echo Downloading FFmpeg...
+curl -L -o "%FFMPEG_ZIP%" "%FFMPEG_URL%"
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to download FFmpeg. Check your internet connection.
+    pause
+    exit /b 1
+)
+
+echo Extracting FFmpeg...
+mkdir "%FFMPEG_DIR%" 2>nul
+powershell -Command "Expand-Archive -Path '%FFMPEG_ZIP%' -DestinationPath '%SCRIPT_DIR%' -Force"
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to extract FFmpeg.
+    pause
+    exit /b 1
+)
+
+:: Move ffmpeg.exe from nested folder to ffmpeg dir
+for /d %%i in ("%SCRIPT_DIR%ffmpeg-*") do (
+    if exist "%%i\bin\ffmpeg.exe" (
+        move "%%i\bin\ffmpeg.exe" "%FFMPEG_DIR%\" >nul
+        move "%%i\bin\ffprobe.exe" "%FFMPEG_DIR%\" >nul 2>nul
+        rd /s /q "%%i" 2>nul
+    )
+)
+
+del "%FFMPEG_ZIP%" 2>nul
+echo [OK] FFmpeg installed successfully!
 echo.
 
 :check_deps
