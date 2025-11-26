@@ -121,7 +121,7 @@ if "%PYTHON_EXE%"=="python" (
     python -m pip install Flask Werkzeug -q 2>nul
 )
 
-start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && "%PYTHON_EXE%" app.py & echo. & echo ======================================== & echo Server stopped or failed. See error above. & echo ======================================== & pause"
+start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && echo Current folder: %SCRIPT_DIR% && echo. && dir app.py 2>nul || echo [ERROR] app.py NOT FOUND in this folder! && echo. && "%PYTHON_EXE%" app.py & echo. & echo ======================================== & echo Server stopped or failed. See error above. & echo ======================================== & pause"
 
 echo Waiting for server...
 timeout /t 2 >nul
