@@ -116,10 +116,9 @@ if not exist "%SCRIPT_DIR%app.py" (
 )
 
 :: Install dependencies for system Python too
-if "%PYTHON_EXE%"=="python" (
-    echo Checking dependencies...
-    python -m pip install Flask Werkzeug -q 2>nul
-)
+echo Checking dependencies...
+"%PYTHON_EXE%" -m pip install Flask Werkzeug -q 2>nul
+echo [OK] Dependencies ready.
 
 start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && echo Current folder: %SCRIPT_DIR% && echo. && dir app.py 2>nul || echo [ERROR] app.py NOT FOUND in this folder! && echo. && "%PYTHON_EXE%" app.py & echo. & echo ======================================== & echo Server stopped or failed. See error above. & echo ======================================== & pause"
 
