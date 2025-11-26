@@ -105,7 +105,23 @@ echo.
 
 :run_server
 echo Starting server...
-start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && "%PYTHON_EXE%" app.py"
+echo.
+
+:: Check if app.py exists
+if not exist "%SCRIPT_DIR%app.py" (
+    echo [ERROR] app.py not found in %SCRIPT_DIR%
+    echo Please make sure you extracted all files correctly.
+    pause
+    exit /b 1
+)
+
+:: Install dependencies for system Python too
+if "%PYTHON_EXE%"=="python" (
+    echo Checking dependencies...
+    python -m pip install Flask Werkzeug -q 2>nul
+)
+
+start "WebM Metadata Editor" cmd /k "cd /d %SCRIPT_DIR% && "%PYTHON_EXE%" app.py || (echo. && echo [ERROR] Server failed to start! && pause)"
 
 echo Waiting for server...
 timeout /t 2 >nul
